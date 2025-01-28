@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Statistics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        header button:hover {
+            background-color: #0056b3;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        .movie-item,
+        .order-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .movie-item button {
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .movie-item button:hover {
+            background-color: #0056b3;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 400px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 50px;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 60%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Movie Statistics</h1>
+        <div>
+            <button onclick="backToDashboard()">Back to Dashboard</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </header>
+    <main>
+        <section>
+            <h2>Movies in Stock</h2>
+            <div id="movie-list"></div>
+        </section>
+        <section>
+            <h2>Order History</h2>
+            <div id="order-history">
+                <p>Loading orders...</p>
+            </div>
+        </section>
+        <section>
+            <h2>Generate Report</h2>
+            <textarea id="report-comment" placeholder="Add a comment to your report..."></textarea>
+            <button onclick="generateReport()">Generate Report</button>
+        </section>
+        <section>
+            <h2>View Report</h2>
+            <button onclick="viewReport()">View Report</button>
+        </section>
+        <section>
+            <h2>Movie Statistics Charts</h2>
+            <div style="background: white; padding: 20px; border-radius: 10px;">
+                <h3>Number of Reviews per Movie</h3>
+                <canvas id="reviewChart"></canvas>
+                <h3>Order Statistics per Movie</h3>
+                <canvas id="orderChart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <!-- Reviews Modal -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('reviewModal')">&times;</span>
+            <h3>Reviews</h3>
+            <div id="reviewContent"></div>
+        </div>
+    </div>
+
+    <!-- Add Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const movies = JSON.parse(localStorage.getItem("movies")) || [];
+        const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+        // Display movies in stock
+        function displayMovies() {
+            const container = document.getElementById("movie-list");
+            container.innerHTML = movies
+                .map(movie => `
+                    <div class="movie-item">
+                        <p><strong>Title:</strong> ${movie.title}</p>
+                        <button onclick="viewReviews('${movie.title}')">View Reviews</button>
+                    </div>
+                `)
+                .join("");
+        }
+
+        // Display order history
+        function displayOrderHistory() {
+            const container = document.getElementById("order-history");
+            container.innerHTML = orders.length
+                ? orders.map(order => `
+                    <div class="order-item">
+                        <h3>Order ID: ${order.orderId}</h3>
+                        <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
+                        <p><strong>Status:</strong> ${order.status}</p>
+                        <p><strong>Total Amount:</strong> $${order.totalAmount}</p>
+                        <p><strong>Movies Ordered:</strong> ${order.movies.map(movie => movie.title).join(", ")}</p>
+                    </div>
+                `).join("")
+                : "<p>No orders found.</p>";
+        }
+
+        // View reviews for a specific movie
+        function viewReviews(title) {
+            const reviews = JSON.parse(localStorage.getItem(`reviews_${title}`)) || [];
+            const reviewContent = document.getElementById("reviewContent");
+
+            reviewContent.innerHTML = reviews.length
+                ? reviews.map(review => `<p><strong>${review.user || "Anonymous"}:</strong> ${review.comment}</p>`).join("")
+                : "<p>No reviews available for this movie.</p>";
+
+            document.getElementById("reviewModal").style.display = "block";
+        }
+
+        // Close the modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Generate Review Chart
+        function generateReviewChart() {
+            const reviewData = movies.map(movie => {
+                const reviews = JSON.parse(localStorage.getItem(`reviews_${movie.title}`)) || [];
+                return { title: movie.title, reviews: reviews.length };
+            });
+
+            new Chart(document.getElementById("reviewChart"), {
+                type: "bar",
+                data: {
+                    labels: reviewData.map(data => data.title),
+                    datasets: [{
+                        label: "Number of Reviews",
+                        data: reviewData.map(data => data.reviews),
+                        backgroundColor: "rgba(54, 162, 235, 0.6)"
+                    }]
+                }
+            });
+        }
+
+        // Generate Order Chart
+        function generateOrderChart() {
+            const orderData = movies.map(movie => {
+                const count = orders.filter(order => order.movies.some(m => m.title === movie.title)).length;
+                return { title: movie.title, orders: count };
+            });
+
+            new Chart(document.getElementById("orderChart"), {
+                type: "bar",
+                data: {
+                    labels: orderData.map(data => data.title),
+                    datasets: [{
+                        label: "Number of Orders",
+                        data: orderData.map(data => data.orders),
+                        backgroundColor: "rgba(255, 99, 132, 0.6)"
+                    }]
+                }
+            });
+        }
+
+        function generateReport() {
+            const comment = document.getElementById("report-comment").value.trim();
+            const report = {
+                totalMovies: movies.length,
+                totalOrders: orders.length,
+                comment: comment || "No comments added."
+            };
+            localStorage.setItem("movieReport", JSON.stringify(report));
+            alert("Report generated successfully!");
+        }
+
+        function viewReport() {
+            const report = JSON.parse(localStorage.getItem("movieReport")) || null;
+            if (report) {
+                alert(`
+                    Total Movies: ${report.totalMovies}
+                    Total Orders: ${report.totalOrders}
+                    Comment: ${report.comment}
+                `);
+            } else {
+                alert("No report available.");
+            }
+        }
+
+        function backToDashboard() {
+            window.location.href = "admin-dashboard.html";
+        }
+
+        function logout() {
+            window.location.href = "index.html";
+        }
+
+        function initializePage() {
+            displayMovies();
+            displayOrderHistory();
+            generateReviewChart();
+            generateOrderChart();
+        }
+
+        window.onload = initializePage;
+    </script>
+</body>
+</html>

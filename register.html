@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login">
+        <h1 class="login__title">Register</h1>
+        
+        <form action="" class="login__form" id="register-form">
+            <div class="login__inputs">
+                <div class="login__box">
+                    <input type="text" id="reg-username" placeholder="Username" required class="login__input">
+                    <i class="ri-user-line"></i>
+                </div>
+
+                <div class="login__box">
+                    <input type="password" id="reg-password" placeholder="Password" required class="login__input">
+                    <i class="ri-lock-2-fill"></i>
+                </div>
+
+                <div class="login__box">
+                    <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required class="login__input">
+                    <i class="ri-lock-2-fill"></i>
+                </div>
+            </div>
+
+            <button type="button" class="login__button" onclick="register()">Register</button>
+
+            <div class="login__register">
+                Already have an account? <a href="index.html">Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function register() {
+        const username = document.getElementById("reg-username").value.trim();
+        const password = document.getElementById("reg-password").value.trim();
+        const confirmPassword = document.getElementById("reg-confirm-password").value.trim();
+
+        if (!username || !password || !confirmPassword) {
+            alert("Please fill out all fields.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match.");
+            return;
+        }
+
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        if (users.some(u => u.username === username)) {
+            alert("Username already taken.");
+            return;
+        }
+
+        users.push({ username, password });
+        localStorage.setItem("users", JSON.stringify(users));
+
+        alert("Registration successful! Please log in.");
+        window.location.href = "index.html";
+    }
+</script>
+
+</body>
+</html>

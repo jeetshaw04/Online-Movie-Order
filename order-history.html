@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .order-item {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Order History</h1>
+    <div id="order-history"></div>
+
+    <script>
+        function displayOrderHistory() {
+            const orderHistoryDiv = document.getElementById("order-history");
+            const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+            if (orders.length === 0) {
+                orderHistoryDiv.innerHTML = "<p>No orders found.</p>";
+                return;
+            }
+
+            orders.forEach(order => {
+                const orderItem = document.createElement("div");
+                orderItem.classList.add("order-item");
+                orderItem.innerHTML = `
+                    <h3>Order ID: ${order.orderId}</h3>
+                    <p><strong>Date:</strong> ${new Date(order.date).toLocaleDateString()}</p>
+                    <p><strong>Status:</strong> ${order.status}</p>
+                    <p><strong>Total Amount:</strong> $${order.totalAmount}</p>
+                    <p><strong>Movies Ordered:</strong> ${order.movies.map(movie => movie.title).join(", ")}</p>
+                `;
+                orderHistoryDiv.appendChild(orderItem);
+            });
+        }
+
+        displayOrderHistory();
+    </script>
+</body>
+</html>

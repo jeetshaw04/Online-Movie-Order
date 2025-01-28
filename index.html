@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Order Login</title>
+
+    <!-- REMIXICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login">
+        <h1 class="login__title">Login</h1>
+        
+        <form action="" class="login__form" id="login-form">
+            <div class="login__inputs">
+                <div class="login__box">
+                    <input type="text" id="username" placeholder="Username" required class="login__input">
+                    <i class="ri-user-line"></i>
+                </div>
+
+                <div class="login__box">
+                    <input type="password" id="password" placeholder="Password" required class="login__input">
+                    <i class="ri-lock-2-fill"></i>
+                </div>
+            </div>
+
+            <div class="login__check">
+                <div class="login__check-box">
+                    <input type="checkbox" class="login__check-input" id="user-check">
+                    <label for="user-check" class="login__check-label">Remember me</label>
+                </div>
+                <a href="#" class="login__forgot">Forgot Password?</a>
+            </div>
+
+            <button type="button" class="login__button" onclick="login()">Login</button>
+            <button type="button" class="login__button" onclick="loginAsGuest()">Login as Guest</button>
+            <button type="button" class="login__button" onclick="redirectAdminLogin()">Login as Administrator</button>
+
+            <div class="login__register">
+                Don't have an account? <a href="register.html">Register</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // User login
+    function login() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            localStorage.setItem("currentUser", username);
+            alert("Login successful!");
+            window.location.href = "movie-list.html";
+        } else {
+            alert("Invalid username or password.");
+        }
+    }
+
+    // Guest login
+    function loginAsGuest() {
+        localStorage.setItem("currentUser", "Guest");
+        window.location.href = "movie-list.html";
+    }
+
+    // Admin login redirection
+    function redirectAdminLogin() {
+        window.location.href = "admin-login.html";
+    }
+</script>
+
+</body>
+</html>

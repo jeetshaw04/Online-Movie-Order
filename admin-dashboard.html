@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!--=============== REMIXICONS ===============-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+
+    <!--=============== Google Fonts ===============-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login">
+            <h1 class="login__title">Admin Dashboard</h1>
+            <div class="login__form">
+                <!-- View Statistics Button -->
+                <button class="login__button" onclick="viewStatistics()">View Statistics & Generate Report</button>
+
+                <!-- Stock Update Button -->
+                <button class="login__button" onclick="updateStock()">Stock Verification & Update</button>
+
+                <!-- Logout Button -->
+                <button class="login__button" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to handle viewing statistics
+        function viewStatistics() {
+            window.location.href = "movie-statistics.html"; // Redirect to the statistics page
+        }
+
+        // Function to handle stock update (redirect to stock-update page)
+        function updateStock() {
+            window.location.href = 'stock-update.html'; // Redirect to stock update page
+        }
+
+        // Function for logout (redirect to login page)
+        function logout() {
+            window.location.href = 'index.html'; // Redirect to login page
+        }
+    </script>
+</body>
+</html>

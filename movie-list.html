@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+            background-image: url('bg.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: rgba(29, 31, 33, 0.8); /* Slight transparency to blend with the background */
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        header button, .cart-icon, .user-icon, .order-history-icon {
+            background-color: #f1f1f1;
+            color: #333;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin-left: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        header button:hover, .cart-icon:hover, .user-icon:hover, .order-history-icon:hover {
+            background-color: #ddd;
+        }
+
+        .cart-icon, .user-icon, .order-history-icon {
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        #cart-count {
+            background-color: red;
+            border-radius: 50%;
+            padding: 5px 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: #444;
+            text-align: center;
+        }
+
+        .movie-item {
+            display: flex;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .movie-item img {
+            width: 150px;
+            height: 225px;
+            object-fit: cover;
+        }
+
+        .movie-details {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .movie-details h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .movie-details p {
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .movie-details button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .movie-details button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Movie List</h1>
+    <div>
+        <span class="cart-icon" onclick="redirectToCart()">
+            🛒 <span id="cart-count">0</span>
+        </span>
+        <span class="user-icon" onclick="showUserDetails()">
+            👤 User
+        </span>
+        <span class="order-history-icon" onclick="redirectToOrderHistory()">
+            📜 Order History
+        </span>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<main>
+    <h2>Movies</h2>
+    <div id="movie-list"></div>
+</main>
+
+<script>
+// Get movies from localStorage or initialize an empty list
+const movies = JSON.parse(localStorage.getItem("movies")) || [];
+
+// Get cart from localStorage or initialize an empty cart
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+// Function to display movies
+function displayMovies() {
+    const movieList = document.getElementById("movie-list");
+    movieList.innerHTML = "";
+
+    if (movies.length === 0) {
+        movieList.innerHTML = "<p>No movies available. Add movies to stock.</p>";
+        return;
+    }
+
+    movies.forEach((movie, index) => {
+        const movieItem = document.createElement("div");
+        movieItem.classList.add("movie-item");
+
+        movieItem.innerHTML = `
+            <img src="${movie.poster}" alt="${movie.title} Poster">
+            <div class="movie-details">
+                <h3>${movie.title}</h3>
+                <p><strong>Genre:</strong> ${movie.genre}</p>
+                <p><strong>Price:</strong> ${movie.price}</p>
+                <p><strong>Description:</strong> ${movie.description || "No description available"}</p>
+                <button onclick="viewMovieDetails(${index})">View Movie Details</button>
+                <button onclick="addToCart(${index})">Add to Cart</button>
+            </div>
+        `;
+
+        movieList.appendChild(movieItem);
+    });
+}
+
+// Add a movie to the cart
+function addToCart(index) {
+    const movie = movies[index];
+    cart.push(movie);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+    alert(`${movie.title} added to cart.`);
+}
+
+// Update the cart count in the header
+function updateCartCount() {
+    const cartCount = document.getElementById("cart-count");
+    cartCount.textContent = cart.length;
+}
+
+// Redirect to the cart page
+function redirectToCart() {
+    window.location.href = "cart.html";
+}
+
+// Show user details (with name and address)
+function showUserDetails() {
+    alert("User: Jeet Shaw\nAddress: Kolkata");
+}
+
+// Redirect to the order history page
+function redirectToOrderHistory() {
+    window.location.href = "order-history.html";
+}
+
+// Logout the user
+function logout() {
+    alert("Logged out successfully!");
+    window.location.href = "index.html";
+}
+
+// Redirect to movie-details.html with the movie index
+function viewMovieDetails(index) {
+    window.location.href = `movie-details.html?movieIndex=${index}`;
+}
+
+// Display the movie list when the page loads
+displayMovies();
+
+</script>
+</body>
+</html>

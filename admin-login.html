@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+
+    <!--=============== REMIXICONS ===============-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+
+    <!--=============== Google Fonts ===============-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login">
+            <h1 class="login__title">Admin Login</h1>
+
+            <form action="" class="login__form" id="admin-login-form">
+                <div class="login__inputs">
+                    <div class="login__box">
+                        <input type="text" id="admin-username" placeholder="Username" required class="login__input">
+                        <i class="ri-user-line"></i>
+                    </div>
+
+                    <div class="login__box">
+                        <input type="password" id="admin-password" placeholder="Password" required class="login__input">
+                        <i class="ri-lock-2-fill"></i>
+                    </div>
+                </div>
+
+                <div class="login__check">
+                    <div class="login__check-box">
+                        <input type="checkbox" class="login__check-input" id="admin-check">
+                        <label for="admin-check" class="login__check-label">Remember me</label>
+                    </div>
+                    <a href="#" class="login__forgot">Forgot Password?</a>
+                </div>
+
+                <button type="button" class="login__button" onclick="adminLogin()">Login</button>
+
+                <div class="login__register">
+                    Not an admin? <a href="index.html">Return to User Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function adminLogin() {
+            const username = document.getElementById('admin-username').value.trim();
+            const password = document.getElementById('admin-password').value.trim();
+
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('currentAdmin', username);
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

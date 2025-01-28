@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login">
+            <h1 class="login__title">Order Confirmation</h1>
+            <div id="order-summary">
+                <h2 class="login__subtitle">Order Summary</h2>
+                <div id="order-details" class="login__form"></div>
+            </div>
+            <div class="login__buttons">
+                <button class="login__button" onclick="confirmOrder()">Confirm Order</button>
+                <button class="login__button" onclick="goBack()">Back to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        function displayOrderDetails() {
+            const orderDetails = document.getElementById("order-details");
+            orderDetails.innerHTML = "";
+            cart.forEach((item) => {
+                const orderItem = document.createElement("div");
+                orderItem.classList.add("login__box");
+                orderItem.innerHTML = `
+                    <h3>${item.title}</h3>
+                    <p>Genre: ${item.genre}</p>
+                    <p>Price: $${item.price}</p>
+                `;
+                orderDetails.appendChild(orderItem);
+            });
+        }
+
+        function confirmOrder() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            const orderId = Date.now(); // Unique Order ID
+            const date = new Date().toISOString();
+            const totalAmount = cart.reduce((total, item) => total + parseFloat(item.price), 0);
+            const newOrder = {
+                orderId,
+                date,
+                movies: cart,
+                totalAmount,
+                user: localStorage.getItem("currentUser") || "Guest",
+                status: "Payment Pending" // Initial status
+            };
+
+            const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+            existingOrders.push(newOrder);
+            localStorage.setItem("orders", JSON.stringify(existingOrders));
+            localStorage.removeItem("cart");
+            localStorage.setItem("orderId", orderId);
+            window.location.href = "payment.html";
+        }
+
+        function goBack() {
+            window.location.href = "cart.html";
+        }
+
+        displayOrderDetails();
+    </script>
+</body>
+</html>

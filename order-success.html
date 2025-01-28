@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('bg3.jpg') no-repeat center center fixed; /* Add your background image */
+            background-size: cover;
+            color: #fff;
+            text-align: center;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.7); /* Transparent background for the header */
+            padding: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        main {
+            margin: 50px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.9); /* Slightly transparent white box */
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        .order-details {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-details h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .order-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .order-details ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <header>Order Successful!</header>
+    <main>
+       <p style="color: #333; font-weight: bold;">Thank you for your purchase! Your order has been successfully placed.</p>
+        <div class="order-details">
+            <h2>Order Details</h2>
+            <p><strong>Order ID:</strong> <span id="order-id"></span></p>
+            <p><strong>Status:</strong> <span id="order-status"></span></p>
+            <ul id="order-details"></ul>
+        </div>
+        <button onclick="redirectToHome()">Back to Main Menu</button>
+    </main>
+    <footer>
+        <p>&copy; 2025 Movie Store. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function displayOrderDetails() {
+            const orderId = parseInt(localStorage.getItem("orderId"));
+            const orders = JSON.parse(localStorage.getItem("orders")) || [];
+            const order = orders.find(o => o.orderId === orderId);
+
+            const orderIdElement = document.getElementById("order-id");
+            const orderStatusElement = document.getElementById("order-status");
+            const orderDetailsList = document.getElementById("order-details");
+
+            if (order) {
+                orderIdElement.textContent = orderId;
+                orderStatusElement.textContent = order.status;
+                order.movies.forEach(movie => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+    <strong style="color: #333;">${movie.title}</strong> - 
+    <span style="color: #333;">$${movie.price}</span>
+`;
+                    orderDetailsList.appendChild(li);
+                });
+            }
+        }
+
+        function redirectToHome() {
+            window.location.href = "movie-list.html";
+        }
+
+        window.onload = displayOrderDetails;
+    </script>
+</body>
+</html>

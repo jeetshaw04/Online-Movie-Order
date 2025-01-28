@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        /* Styling remains the same */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        header button:hover {
+            background-color: #0056b3;
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        .movie-details, .review-section {
+            background: white;
+            padding: 20px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        .review-section textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .review-section button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .review-section button:hover {
+            background-color: #218838;
+        }
+        .stars {
+            font-size: 24px;
+            cursor: pointer;
+            color: gray;
+        }
+        .stars.selected {
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Movie Details</h1>
+    <button onclick="goBack()">Back to Movie List</button>
+</header>
+
+<main>
+    <div class="movie-details" id="movie-details"></div>
+
+    <div class="review-section">
+        <h3>Rate this Movie:</h3>
+        <div class="stars" id="star-rating">
+            ★★★★★
+        </div>
+
+        <textarea id="user-review" placeholder="Write your review..."></textarea>
+        <button onclick="submitReview()">Submit Review</button>
+        <h3>Reviews:</h3>
+        <div id="reviews"></div>
+    </div>
+</main>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieIndex = urlParams.get("movieIndex");
+
+    const movies = JSON.parse(localStorage.getItem("movies")) || [
+        {
+            title: "Deadpool & Wolverine",
+            genre: "Superhero",
+            price: "$1000",
+            description: "Deadpool's peaceful existence comes crashing down when the Time Variance Authority recruits him to safeguard the multiverse."
+        },
+        {
+            title: "Dune Part 2",
+            genre: "Science Fiction",
+            price: "$1200",
+            description: "The saga of Paul Atreides continues as he unites the Fremen to restore justice to Arrakis."
+        }
+    ];
+
+    const movie = movies[movieIndex] || {
+        title: "Untitled Movie",
+        genre: "Unknown",
+        price: "N/A",
+        description: "No description available."
+    };
+
+    const reviewsKey = `reviews_${movie.title}`;
+    const reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+
+    document.getElementById("movie-details").innerHTML = `
+        <h2>${movie.title}</h2>
+        <p><strong>Genre:</strong> ${movie.genre}</p>
+        <p><strong>Price:</strong> ${movie.price}</p>
+        <p><strong>Description:</strong> ${movie.description}</p>
+    `;
+
+    let selectedRating = 0;
+
+    document.getElementById("star-rating").addEventListener("click", (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const starWidth = rect.width / 5;
+        selectedRating = Math.ceil((e.clientX - rect.left) / starWidth);
+        e.target.innerHTML = "★★★★★".slice(0, selectedRating) + "☆☆☆☆☆".slice(selectedRating);
+    });
+
+    function displayReviews() {
+        const reviewSection = document.getElementById("reviews");
+        reviewSection.innerHTML = reviews
+            .map(review => `<p><strong>${review.user || "Anonymous"}:</strong> ${review.comment} - ⭐${review.rating}</p>`)
+            .join("");
+    }
+
+    function submitReview() {
+        const comment = document.getElementById("user-review").value.trim();
+        const username = localStorage.getItem("currentUser") || "Anonymous";
+
+        if (comment && selectedRating > 0) {
+            reviews.push({ user: username, comment, rating: selectedRating });
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+            document.getElementById("user-review").value = "";
+            displayReviews();
+
+            localStorage.setItem(`statistics_${movie.title}`, JSON.stringify(reviews));
+        } else {
+            alert("Please add a review and a rating.");
+        }
+    }
+
+    function goBack() {
+        window.location.href = "movie-list.html";
+    }
+
+    displayReviews();
+</script>
+
+</body>
+</html>

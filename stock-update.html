@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('bg2.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.7); /* Transparent black */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        main {
+            padding: 20px;
+        }
+        section {
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="file"] {
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Stock Update</h1>
+        <button onclick="logout()">Logout</button>
+    </header>
+    <main>
+        <section>
+            <h2>Add New Movie</h2>
+            <input type="text" id="new-movie-title" placeholder="Enter Movie Title">
+            <input type="text" id="new-movie-genre" placeholder="Enter Genre">
+            <input type="number" id="new-movie-price" placeholder="Enter Price" min="0">
+            <textarea id="new-movie-description" placeholder="Enter Description"></textarea>
+            <input type="file" id="new-movie-poster" accept="image/*">
+            <button onclick="addMovie()">Add Movie</button>
+        </section>
+
+        <section>
+            <h2>Search Movies</h2>
+            <input type="text" id="search-movie" placeholder="Search by title" oninput="searchMovies()">
+            <div id="movie-results"></div>
+        </section>
+
+        <section>
+            <h2>Request New Movie</h2>
+            <input type="text" id="request-movie-title" placeholder="Enter Movie Title">
+            <button onclick="requestNewMovie()">Request</button>
+        </section>
+    </main>
+
+    <script>
+        const movies = JSON.parse(localStorage.getItem("movies")) || [];
+
+        function searchMovies() {
+            const query = document.getElementById("search-movie").value.toLowerCase();
+            const results = document.getElementById("movie-results");
+            results.innerHTML = "";
+
+            movies.filter(movie => movie.title.toLowerCase().includes(query)).forEach((movie, index) => {
+                const movieItem = document.createElement("div");
+                movieItem.classList.add("movie-item");
+                movieItem.innerHTML = `
+                    <p><strong>Title:</strong> ${movie.title}</p>
+                    <p><strong>Genre:</strong> ${movie.genre}</p>
+                    <p><strong>Price:</strong> ${movie.price}</p>
+                    <p><strong>Description:</strong> ${movie.description || "No description provided"}</p>
+                    <img src="${movie.poster}" alt="${movie.title} Poster" style="width: 100px; height: auto;">
+                    <button onclick="editMovie(${index})">Edit Movie</button>
+                    <button class="remove-button" onclick="removeMovie(${index})">Remove Movie</button>
+                `;
+                results.appendChild(movieItem);
+            });
+        }
+
+        function addMovie() {
+            const title = document.getElementById("new-movie-title").value.trim();
+            const genre = document.getElementById("new-movie-genre").value.trim();
+            const price = document.getElementById("new-movie-price").value.trim();
+            const description = document.getElementById("new-movie-description").value.trim();
+            const posterFile = document.getElementById("new-movie-poster").files[0];
+
+            if (title && genre && price && description && posterFile) {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    const posterURL = reader.result;
+
+                    const newMovie = { 
+                        title, 
+                        genre, 
+                        price: "$." + price, 
+                        description, 
+                        poster: posterURL 
+                    };
+
+                    movies.push(newMovie);
+                    localStorage.setItem("movies", JSON.stringify(movies));
+                    alert(`Movie "${title}" added to stock.`);
+                    window.location.href = 'movie-list.html';
+                };
+                reader.readAsDataURL(posterFile);
+            } else {
+                alert("Please fill in all fields and upload a poster.");
+            }
+        }
+
+        function editMovie(index) {
+            const movie = movies[index];
+            const newTitle = prompt("Edit Title:", movie.title);
+            const newGenre = prompt("Edit Genre:", movie.genre);
+            const newPrice = prompt("Edit Price:", movie.price.replace("$", ""));
+            const newDescription = prompt("Edit Description:", movie.description || "");
+
+            if (newTitle && newGenre && newPrice && newDescription) {
+                movies[index] = { 
+                    ...movie, 
+                    title: newTitle, 
+                    genre: newGenre, 
+                    price: "$." + newPrice, 
+                    description: newDescription 
+                };
+                localStorage.setItem("movies", JSON.stringify(movies));
+                alert("Movie updated successfully!");
+                searchMovies();
+            } else {
+                alert("All fields are required to update the movie.");
+            }
+        }
+
+        function removeMovie(index) {
+            if (confirm("Are you sure you want to remove this movie?")) {
+                movies.splice(index, 1);
+                localStorage.setItem("movies", JSON.stringify(movies));
+                alert("Movie removed successfully!");
+                searchMovies();
+            }
+        }
+
+        function requestNewMovie() {
+            const title = document.getElementById("request-movie-title").value.trim();
+
+            if (title) {
+                const newMovie = {
+                    title,
+                    genre: "Coming Soon",
+                    price: "TBA",
+                    description: "Coming Soon",
+                    poster: "",
+                };
+                movies.push(newMovie);
+                localStorage.setItem("movies", JSON.stringify(movies));
+                alert(`Request for "${title}" has been added as "Coming Soon".`);
+                document.getElementById("request-movie-title").value = "";
+            } else {
+                alert("Please enter a movie title.");
+            }
+        }
+
+        function logout() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
