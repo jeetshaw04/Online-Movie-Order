@@ -3,6 +3,9 @@
 
 
 
+Admin id - admin
+Admin Password -admin123
+
 
 A web portal for movie ordering with multiple features such as Stock Update, Movie Update, Reviews, Movie Statistics, and Movie Checkout.
 
@@ -21,6 +24,8 @@ A live URL link to access the project online
 
 ⚠️ Note: The images used in the repository are for representation purposes only.
 
+
+Currently there is no movie in movie list , add them via administrator page
 
 ---
 
