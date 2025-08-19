@@ -1,4 +1,23 @@
 # Online-Movie-Order
-A Portal for Movie Ordering with functions like Stock Update, Movie Update , Reviews , Movies Statistics and Movie Checkout 
-I have uploaded all the codes alongwith the screenshots and images I have used like Background images or for movie posters etc and a pdf file how to update movie in the pages .
-THE IMAGES ARE JUST FOR REPRESENTATION
+
+A web portal for movie ordering with multiple features such as Stock Update, Movie Update, Reviews, Movie Statistics, and Movie Checkout.
+
+I have uploaded:
+
+All the project codes
+
+ images (used as background images, movie posters, etc.)
+
+A PDF guide explaining how to update movies in the pages
+Screenshots of Webpages
+A video demonstration of the website running
+
+A live URL link to access the project online
+
+
+⚠️ Note: The images used in the repository are for representation purposes only.
+
+
+---
+
+Made by Jeet Shaw
